@@ -1,0 +1,40 @@
+name: Build Mini Tractor APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Unzip project
+        run: |
+          unzip -o minitactor.zip -d project
+          find project -maxdepth 3 -type f | head -100
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Build APK
+        run: |
+          cd project
+          gradle :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mini-Tractor-APK
+          path: project/**/build/outputs/apk/debug/*.apk
+          
